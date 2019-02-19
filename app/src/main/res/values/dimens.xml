@@ -3,8 +3,8 @@
     <dimen name="msg_space_vertical">10dp</dimen>
     <dimen name="msg_space_start">10dp</dimen>
     <dimen name="msg_space_end">60dp</dimen>
-    <dimen name="msg_content_text_size">15sp</dimen>
-    <dimen name="msg_nickname_text_size">12sp</dimen>
+    <dimen name="msg_content_text_size">14sp</dimen>
+    <dimen name="msg_nickname_text_size">14sp</dimen>
     <dimen name="msg_time_text_size">10sp</dimen>
-    <dimen name="msg_space_time_and_nickname">8dp</dimen>
+    <dimen name="msg_space_time_and_nickname">5dp</dimen>
 </resources>

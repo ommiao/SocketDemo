@@ -3,6 +3,7 @@ package cn.ommiao.socketdemo;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.LinearLayoutManager;
+import android.view.Menu;
 
 import com.gyf.barlibrary.ImmersionBar;
 
@@ -28,7 +29,7 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> {
 
     @Override
     protected void immersionBar() {
-        ImmersionBar.with(this).titleBar(R.id.toolbar).init();
+        ImmersionBar.with(this).titleBar(R.id.toolbar).keyboardEnable(true).init();
     }
 
     @Override
@@ -38,6 +39,7 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> {
 
     @Override
     protected void initViews() {
+        setSupportActionBar(mBinding.toolbar);
         nickname = getIntent().getStringExtra("nickname");
         String subTitle = "I'm " + nickname + ".";
         mBinding.toolbar.setSubtitle(subTitle);
@@ -47,11 +49,17 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_chat_toolbar, menu);
+        return true;
+    }
+
+    @Override
     protected void initDatas() {
         for(int i = 0; i < 10; i++){
             MessageEntity entity = new MessageEntity();
             entity.setNickname(nickname);
-            entity.setTime("02-19 15:3" + i);
+            entity.setTime("15:3" + i);
             entity.setContent(randomContent());
             entity.setType(randomType());
             messages.add(entity);

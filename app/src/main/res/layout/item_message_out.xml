@@ -34,16 +34,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             tools:text="02-19 13:40"
-            android:fontFamily="@font/sinkin"
+            android:fontFamily="@font/graydesign"
             android:textSize="@dimen/msg_time_text_size"/>
 
         <TextView
             android:id="@+id/tv_nickname"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="@dimen/msg_nickname_text_size"
+            android:layout_marginLeft="@dimen/msg_space_time_and_nickname"
             tools:text="oMMiao"
-            android:fontFamily="@font/sinkin"
+            android:textStyle="bold"
+            android:fontFamily="@font/graydesign"
             android:textSize="@dimen/msg_nickname_text_size"/>
 
     </LinearLayout>

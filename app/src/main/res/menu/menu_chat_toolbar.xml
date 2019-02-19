@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/toolbar_people"
+        android:icon="@drawable/ic_people_online"
+        android:title="Action"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/toolbar_exit"
+        android:icon="@drawable/ic_exit"
+        android:title="退出"
+        app:showAsAction="always"/>
+
+</menu>
