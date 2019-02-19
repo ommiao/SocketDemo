@@ -1,15 +1,16 @@
 package cn.ommiao.socketdemo;
 
-import com.gyf.barlibrary.BarHide;
-import com.gyf.barlibrary.ImmersionBar;
+import android.widget.Toast;
 
 import cn.ommiao.socketdemo.databinding.ActivityMainBinding;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
+    private String nicname;
+
     @Override
     protected void immersionBar() {
-        ImmersionBar.with(this).hideBar(BarHide.FLAG_HIDE_BAR).init();
+        super.immersionBar();
     }
 
     @Override
@@ -19,6 +20,22 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     @Override
     protected void initViews() {
+        mBinding.ivEnter.setOnClickListener(v -> startChat());
+    }
 
+    private void startChat() {
+        if(!isDataChecked()){
+            return;
+        }
+        ChatActivity.start(this, nicname);
+    }
+
+    private boolean isDataChecked(){
+        nicname = mBinding.etNicname.getText().toString().trim();
+        if(nicname.length() == 0){
+            Toast.makeText(this, R.string.nicname_required, Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
     }
 }

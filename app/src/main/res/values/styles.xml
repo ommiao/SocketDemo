@@ -8,4 +8,18 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="ToolbarTitle">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:fontFamily">@font/sinkin</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="ToolbarSubTitle">
+        <item name="android:textColor">@android:color/white</item>
+        <item name="android:fontFamily">@font/sinkin</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+
 </resources>

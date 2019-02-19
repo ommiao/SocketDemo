@@ -1,3 +1,6 @@
 <resources>
-    <string name="app_name">SocketDemo</string>
+    <string name="app_name">Socket Demo</string>
+    <string name="chat_room">WeChat</string>
+    <string name="nicname_required">请输入昵称</string>
+    <string name="nickname_here">Nickname here.</string>
 </resources>
