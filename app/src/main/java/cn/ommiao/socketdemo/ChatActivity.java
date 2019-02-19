@@ -2,16 +2,27 @@ package cn.ommiao.socketdemo;
 
 import android.content.Context;
 import android.content.Intent;
+import android.support.v7.widget.LinearLayoutManager;
 
 import com.gyf.barlibrary.ImmersionBar;
 
+import java.util.ArrayList;
+import java.util.Random;
+
+import cn.ommiao.socketdemo.adapter.MessageAdapter;
 import cn.ommiao.socketdemo.databinding.ActivityChatBinding;
+import cn.ommiao.socketdemo.entity.MessageEntity;
 
 public class ChatActivity extends BaseActivity<ActivityChatBinding> {
 
-    public static void start(Context context, String nicname) {
+    private String nickname;
+
+    private MessageAdapter adapter;
+    private ArrayList<MessageEntity> messages = new ArrayList<>();
+
+    public static void start(Context context, String nickname) {
         Intent starter = new Intent(context, ChatActivity.class);
-        starter.putExtra("nicname", nicname);
+        starter.putExtra("nickname", nickname);
         context.startActivity(starter);
     }
 
@@ -27,10 +38,38 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> {
 
     @Override
     protected void initViews() {
-        String nicname = getIntent().getStringExtra("nicname");
-        String title = getString(R.string.chat_room);
-        String subTitle = "I'm " + nicname + ".";
-        mBinding.toolbar.setTitle(title);
+        nickname = getIntent().getStringExtra("nickname");
+        String subTitle = "I'm " + nickname + ".";
         mBinding.toolbar.setSubtitle(subTitle);
+        mBinding.rvMessage.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new MessageAdapter(messages);
+        mBinding.rvMessage.setAdapter(adapter);
+    }
+
+    @Override
+    protected void initDatas() {
+        for(int i = 0; i < 10; i++){
+            MessageEntity entity = new MessageEntity();
+            entity.setNickname(nickname);
+            entity.setTime("02-19 15:3" + i);
+            entity.setContent(randomContent());
+            entity.setType(randomType());
+            messages.add(entity);
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    private int randomType(){
+        return new java.util.Random().nextBoolean() ? 1 : 0;
+    }
+
+    private String randomContent(){
+        Random random = new Random();
+        int len = random.nextInt(10) + 1;
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < len; i++){
+            builder.append("我是一条消息。");
+        }
+        return builder.toString();
     }
 }

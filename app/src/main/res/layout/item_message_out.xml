@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="end"
+    android:layout_marginTop="@dimen/msg_space_vertical"
+    android:layout_marginStart="@dimen/msg_space_end"
+    android:layout_marginEnd="@dimen/msg_space_start">
+
+    <TextView
+        android:id="@+id/tv_msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:text="这是一条假消息，这是一条假消息，这是一条假消息，这是一条假消息，这是一条假消息，这是一条假消息，"
+        android:background="@drawable/shape_msg_out_bg"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/msg_content_text_size"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:paddingLeft="20dp"
+        android:paddingRight="20dp"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="3dp">
+
+        <TextView
+            android:id="@+id/tv_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="02-19 13:40"
+            android:fontFamily="@font/sinkin"
+            android:textSize="@dimen/msg_time_text_size"/>
+
+        <TextView
+            android:id="@+id/tv_nickname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/msg_nickname_text_size"
+            tools:text="oMMiao"
+            android:fontFamily="@font/sinkin"
+            android:textSize="@dimen/msg_nickname_text_size"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>

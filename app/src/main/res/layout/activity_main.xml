@@ -4,66 +4,86 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".MainActivity">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <TextView
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/app_name"
-            android:fontFamily="@font/sinkin"
-            android:textColor="@android:color/black"
-            android:layout_above="@+id/ll_input"
-            android:textSize="30sp"
-            android:gravity="center_horizontal"
-            android:layout_marginBottom="20dp"/>
-
-        <LinearLayout
-            android:id="@+id/ll_input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_centerInParent="true"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:background="@drawable/shape_round_corners"
-            android:gravity="center_vertical">
-
-            <EditText
-                android:id="@+id/et_nicname"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="5"
-                android:layout_margin="5dp"
-                android:paddingLeft="15dp"
-                android:paddingRight="15dp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:textSize="16sp"
-                android:textColor="@color/colorPrimary"
-                android:background="@null"
-                style="@null"
-                android:hint="@string/nickname_here"
-                android:textColorHint="@color/colorPrimary"
-                android:fontFamily="@font/sinkin"
-                android:maxLines="1"
-                android:maxLength="20"
-                android:inputType="textEmailAddress"
-                android:digits="0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                android:cursorVisible="false" />
+            android:layout_height="wrap_content">
 
             <ImageView
-                android:id="@+id/iv_enter"
-                android:layout_width="0dp"
-                android:layout_height="30dp"
-                android:layout_weight="1"
-                android:src="@drawable/ic_enter"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"/>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/bg_main_top"
+                android:scaleType="fitXY"
+                android:adjustViewBounds="true"/>
 
-        </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/app_name"
+                android:fontFamily="@font/sinkin"
+                android:textColor="@android:color/white"
+                android:textSize="30sp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="20dp" />
 
-    </RelativeLayout>
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_gravity="center"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:background="@drawable/shape_round_corners"
+                android:gravity="center_vertical">
+
+                <EditText
+                    android:id="@+id/et_nickname"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="5"
+                    android:layout_margin="5dp"
+                    android:paddingLeft="15dp"
+                    android:paddingRight="15dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:textSize="16sp"
+                    android:textColor="@color/colorPrimary"
+                    android:background="@null"
+                    style="@null"
+                    android:hint="@string/nickname_here"
+                    android:textColorHint="@color/colorPrimary"
+                    android:fontFamily="@font/sinkin"
+                    android:maxLines="1"
+                    android:maxLength="20"
+                    android:inputType="textEmailAddress"
+                    android:digits="0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                    android:cursorVisible="false" />
+
+                <ImageView
+                    android:id="@+id/iv_enter"
+                    android:layout_width="0dp"
+                    android:layout_height="30dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/ic_enter"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="10dp"/>
+
+            </LinearLayout>
+
+        </FrameLayout>
+
+
+
+    </LinearLayout>
 
 </layout>
