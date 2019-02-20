@@ -7,6 +7,8 @@
 
     <color name="gray">#F1F1F1</color>
 
-    <color name="grayDark">#999999</color>
+    <color name="grayDark">#888888</color>
+
+    <color name="colorPrimaryLight">#8D8DDD</color>
 
 </resources>

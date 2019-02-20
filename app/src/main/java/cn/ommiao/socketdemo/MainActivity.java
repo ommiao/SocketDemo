@@ -5,6 +5,7 @@ import android.widget.Toast;
 import com.gyf.barlibrary.ImmersionBar;
 
 import cn.ommiao.socketdemo.databinding.ActivityMainBinding;
+import cn.ommiao.socketdemo.utils.ToastUtil;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
@@ -35,7 +36,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     private boolean isDataChecked(){
         nickname = mBinding.etNickname.getText().toString().trim();
         if(nickname.length() == 0){
-            Toast.makeText(this, R.string.nickname_required, Toast.LENGTH_SHORT).show();
+            ToastUtil.show(R.string.nickname_required);
             return false;
         }
         return true;

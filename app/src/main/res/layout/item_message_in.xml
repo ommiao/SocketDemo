@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         tools:text="这是一条假消息，这是一条假消息，这是一条假消息，这是一条假消息，这是一条假消息，这是一条假消息，"
         android:background="@drawable/shape_msg_in_bg"
-        android:textColor="@android:color/black"
+        android:textColor="@color/grayDark"
         android:textSize="@dimen/msg_content_text_size"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"

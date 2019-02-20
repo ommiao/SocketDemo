@@ -5,13 +5,13 @@
     <item
         android:id="@+id/toolbar_people"
         android:icon="@drawable/ic_people_online"
-        android:title="Action"
-        app:showAsAction="always"/>
+        android:title="@string/chat_toolbar_people"
+        app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/toolbar_exit"
         android:icon="@drawable/ic_exit"
-        android:title="退出"
-        app:showAsAction="always"/>
+        android:title="@string/chat_toolbar_exit"
+        app:showAsAction="ifRoom"/>
 
 </menu>

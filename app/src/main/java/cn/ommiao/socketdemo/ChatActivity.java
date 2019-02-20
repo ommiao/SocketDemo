@@ -2,19 +2,29 @@ package cn.ommiao.socketdemo;
 
 import android.content.Context;
 import android.content.Intent;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.annotation.NonNull;
+import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
 
 import com.gyf.barlibrary.ImmersionBar;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Random;
 
 import cn.ommiao.socketdemo.adapter.MessageAdapter;
 import cn.ommiao.socketdemo.databinding.ActivityChatBinding;
 import cn.ommiao.socketdemo.entity.MessageEntity;
+import cn.ommiao.socketdemo.other.ScrollLinearLayoutManager;
+import cn.ommiao.socketdemo.utils.ToastUtil;
 
-public class ChatActivity extends BaseActivity<ActivityChatBinding> {
+public class ChatActivity extends BaseActivity<ActivityChatBinding> implements TextWatcher, View.OnClickListener {
 
     private String nickname;
 
@@ -43,9 +53,26 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> {
         nickname = getIntent().getStringExtra("nickname");
         String subTitle = "I'm " + nickname + ".";
         mBinding.toolbar.setSubtitle(subTitle);
-        mBinding.rvMessage.setLayoutManager(new LinearLayoutManager(this));
+        ScrollLinearLayoutManager layoutManager = new ScrollLinearLayoutManager(this);
+        layoutManager.setStackFromEnd(true);
+        layoutManager.setSpeedSlow(5);
+        mBinding.rvMessage.setLayoutManager(layoutManager);
         adapter = new MessageAdapter(messages);
         mBinding.rvMessage.setAdapter(adapter);
+        mBinding.etMsg.addTextChangedListener(this);
+        mBinding.btnSend.setOnClickListener(this);
+        mBinding.rvMessage.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
+                if(lastVisibleItemPosition < messages.size() - 1){
+                    layoutManager.setSpeedSlow(0);
+                } else {
+                    layoutManager.setSpeedSlow(5);
+                }
+            }
+        });
     }
 
     @Override
@@ -55,29 +82,90 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.toolbar_people:
+                ToastUtil.show(R.string.chat_toolbar_people);
+                break;
+            case R.id.toolbar_exit:
+                ToastUtil.show(R.string.chat_toolbar_exit);
+                break;
+        }
+        return true;
+    }
+
+    @Override
     protected void initDatas() {
-        for(int i = 0; i < 10; i++){
-            MessageEntity entity = new MessageEntity();
-            entity.setNickname(nickname);
-            entity.setTime("15:3" + i);
-            entity.setContent(randomContent());
-            entity.setType(randomType());
-            messages.add(entity);
-        }
-        adapter.notifyDataSetChanged();
+
     }
 
-    private int randomType(){
-        return new java.util.Random().nextBoolean() ? 1 : 0;
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.btn_send:
+                sendMsg();
+                break;
+        }
     }
 
-    private String randomContent(){
-        Random random = new Random();
-        int len = random.nextInt(10) + 1;
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < len; i++){
-            builder.append("我是一条消息。");
-        }
-        return builder.toString();
+    private void sendMsg() {
+        String content = mBinding.etMsg.getText().toString();
+        MessageEntity entity = new MessageEntity();
+        entity.setType(MessageEntity.TYPE_OUT);
+        entity.setContent(content);
+        entity.setNickname(nickname);
+        SimpleDateFormat sf = new SimpleDateFormat("hh:mm", Locale.CHINESE);
+        entity.setTime(sf.format(new Date()));
+        messages.add(entity);
+        adapter.notifyItemInserted(messages.size() - 1);
+        mBinding.rvMessage.smoothScrollToPosition(messages.size());
+        resetEtMsg();
+        //addVirtualIn();
     }
+
+    private void addVirtualIn() {
+        new Thread(() -> {
+            try {
+                Thread.sleep(1500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            runOnUiThread(() -> {
+                MessageEntity entity = new MessageEntity();
+                entity.setType(MessageEntity.TYPE_IN);
+                entity.setContent("哈哈");
+                entity.setNickname(nickname);
+                SimpleDateFormat sf = new SimpleDateFormat("hh:mm", Locale.CHINESE);
+                entity.setTime(sf.format(new Date()));
+                messages.add(entity);
+                adapter.notifyItemInserted(messages.size() - 1);
+                mBinding.rvMessage.smoothScrollToPosition(messages.size());
+            });
+        }).start();
+    }
+
+    private void resetEtMsg() {
+        mBinding.etMsg.setText("");
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        if(s.length() > 0){
+            mBinding.btnSend.setEnabled(true);
+        } else {
+            mBinding.btnSend.setEnabled(false);
+        }
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
+    }
+
 }

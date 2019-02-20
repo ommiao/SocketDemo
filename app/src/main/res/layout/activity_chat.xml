@@ -13,9 +13,10 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorPrimary"
+            android:elevation="1dp"
             app:title="@string/chat_room"
             app:titleTextAppearance="@style/ToolbarTitle"
-            app:subtitleTextAppearance="@style/ToolbarSubTitle"/>
+            app:subtitleTextAppearance="@style/ToolbarSubTitle" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rv_message"
@@ -31,6 +32,7 @@
             android:gravity="center_vertical">
 
             <EditText
+                android:id="@+id/et_msg"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -42,9 +44,11 @@
                 android:background="@drawable/shape_msg_input_bg"
                 android:maxLines="3"
                 android:textSize="@dimen/msg_content_text_size"
-                android:elevation="1dp"/>
+                android:elevation="1dp"
+                android:hint="@string/chat_msg_input_hint"/>
 
             <ImageButton
+                android:id="@+id/btn_send"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginRight="10dp"

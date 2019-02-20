@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Socket Demo</string>
     <string name="chat_room">WeChat</string>
-    <string name="nickname_required">请输入昵称</string>
+    <string name="nickname_required">Nickname required!</string>
     <string name="nickname_here">Nickname here.</string>
+    <string name="chat_toolbar_people">人员</string>
+    <string name="chat_toolbar_exit">退出</string>
+    <string name="chat_msg_input_hint">Message</string>
 </resources>
