@@ -54,8 +54,8 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
         String subTitle = "I'm " + nickname + ".";
         mBinding.toolbar.setSubtitle(subTitle);
         ScrollLinearLayoutManager layoutManager = new ScrollLinearLayoutManager(this);
-        layoutManager.setStackFromEnd(true);
-        layoutManager.setSpeedSlow(5);
+        layoutManager.setStackFromEnd(false);
+        layoutManager.setSpeed(ScrollLinearLayoutManager.Speed.SPEED_SLOW);
         mBinding.rvMessage.setLayoutManager(layoutManager);
         adapter = new MessageAdapter(messages);
         mBinding.rvMessage.setAdapter(adapter);
@@ -66,10 +66,12 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
                 int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
-                if(lastVisibleItemPosition < messages.size() - 1){
-                    layoutManager.setSpeedSlow(0);
+                if(lastVisibleItemPosition == messages.size() - 1){
+                    layoutManager.setSpeed(ScrollLinearLayoutManager.Speed.SPEED_SLOW);
+                } else if(messages.size() - 1 - lastVisibleItemPosition <= 5) {
+                    layoutManager.setSpeed(ScrollLinearLayoutManager.Speed.SPEED_MEDIAN);
                 } else {
-                    layoutManager.setSpeedSlow(5);
+                    layoutManager.setSpeed(ScrollLinearLayoutManager.Speed.SPEED_FAST);
                 }
             }
         });

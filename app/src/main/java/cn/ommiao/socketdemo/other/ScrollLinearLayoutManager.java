@@ -9,12 +9,20 @@ import android.util.DisplayMetrics;
 
 public class ScrollLinearLayoutManager extends LinearLayoutManager {
 
-    private float MILLISECONDS_PER_INCH = 1f;  //修改可以改变数据,越大速度越慢
+
+    private float MILLISECONDS_PER_INCH;
     private Context contxt;
+
+    private Speed speed;
+
+    public enum Speed{
+        SPEED_SLOW, SPEED_MEDIAN, SPEED_FAST
+    }
 
     public ScrollLinearLayoutManager(Context context) {
         super(context);
         this.contxt = context;
+        setSpeedSlow(5);
     }
 
     @Override
@@ -28,18 +36,27 @@ public class ScrollLinearLayoutManager extends LinearLayoutManager {
                                 .computeScrollVectorForPosition(targetPosition);
                     }
 
-                    //This returns the milliseconds it takes to
-                    //scroll one pixel.
                     @Override
-                    protected float calculateSpeedPerPixel
-                    (DisplayMetrics displayMetrics) {
-                        return MILLISECONDS_PER_INCH / displayMetrics.density;
-                        //返回滑动一个pixel需要多少毫秒
+                    protected float calculateSpeedPerPixel(DisplayMetrics displayMetrics) {
+                        if(speed == Speed.SPEED_FAST){
+                            return super.calculateSpeedPerPixel(displayMetrics);
+                        } else {
+                            return MILLISECONDS_PER_INCH / displayMetrics.density;
+                        }
                     }
 
                 };
         linearSmoothScroller.setTargetPosition(position);
         startSmoothScroll(linearSmoothScroller);
+    }
+
+    public void setSpeed(Speed speed){
+        this.speed = speed;
+        if(speed == Speed.SPEED_MEDIAN){
+            setSpeedSlow(0);
+        } else {
+            setSpeedSlow(5);
+        }
     }
 
     //可以用来设置速度
