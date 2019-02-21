@@ -1,11 +1,10 @@
 package cn.ommiao.socketdemo;
 
-import android.widget.Toast;
 
 import com.gyf.barlibrary.ImmersionBar;
 
-import cn.ommiao.socketdemo.chat.ChatConnectionUtil;
 import cn.ommiao.socketdemo.databinding.ActivityMainBinding;
+import cn.ommiao.socketdemo.utils.ConnectionUtil;
 import cn.ommiao.socketdemo.utils.ToastUtil;
 
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
@@ -32,18 +31,16 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
             return;
         }
         //ChatActivity.start(this, nickname);
-        ChatConnectionUtil.getInstance(this)
-                .tryConnect(new ChatConnectionUtil.ChatConnectionListener() {
-                    @Override
-                    public void onConnected() {
+        testScoket();
+    }
 
-                    }
+    private void testScoket() {
+        new ConnectionUtil()
+                .create(this)
+                .ip("134.175.41.67")
+                .port(2692)
+                .send(nickname, ToastUtil::show);
 
-                    @Override
-                    public void onConnectFail() {
-
-                    }
-                });
     }
 
     private boolean isDataChecked(){
