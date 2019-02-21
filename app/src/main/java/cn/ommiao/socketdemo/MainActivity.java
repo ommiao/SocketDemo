@@ -4,6 +4,7 @@ import android.widget.Toast;
 
 import com.gyf.barlibrary.ImmersionBar;
 
+import cn.ommiao.socketdemo.chat.ChatConnectionUtil;
 import cn.ommiao.socketdemo.databinding.ActivityMainBinding;
 import cn.ommiao.socketdemo.utils.ToastUtil;
 
@@ -30,7 +31,19 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         if(!isDataChecked()){
             return;
         }
-        ChatActivity.start(this, nickname);
+        //ChatActivity.start(this, nickname);
+        ChatConnectionUtil.getInstance(this)
+                .tryConnect(new ChatConnectionUtil.ChatConnectionListener() {
+                    @Override
+                    public void onConnected() {
+
+                    }
+
+                    @Override
+                    public void onConnectFail() {
+
+                    }
+                });
     }
 
     private boolean isDataChecked(){
