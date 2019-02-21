@@ -1,7 +1,7 @@
 package cn.ommiao.socketdemo.socket.interfaces;
 
 
-import cn.ommiao.socketdemo.call.SocketCall;
+import cn.ommiao.socketdemo.socket.call.SocketCall;
 import cn.ommiao.socketdemo.socket.message.MessageWrapper;
 
 
