@@ -33,8 +33,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         if(!isDataChecked()){
             return;
         }
-        ChatActivity.start(this, nickname);
-        //testScoket();
+        //ChatActivity.start(this, nickname);
+        testScoket();
     }
 
     private void testScoket() {

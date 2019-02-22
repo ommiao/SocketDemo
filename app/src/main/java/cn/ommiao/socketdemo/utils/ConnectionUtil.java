@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 import cn.ommiao.socketdemo.BaseActivity;
+import cn.ommiao.socketdemo.socket.Config;
 
 public class ConnectionUtil {
 
@@ -49,10 +50,13 @@ public class ConnectionUtil {
                 while ((s = bufReader.readLine()) != null){
                     Logger.d(s);
                     sb.append(s);
+                    if(s.contains(Config.END)){
+                        break;
+                    }
                 }
                 if(listener != null){
                     context.runOnUiThread(() -> {
-                        listener.onReceived(sb.toString());
+                        listener.onReceived(sb.toString().replace(Config.END, ""));
                     });
                 }
                 bufReader.close();
