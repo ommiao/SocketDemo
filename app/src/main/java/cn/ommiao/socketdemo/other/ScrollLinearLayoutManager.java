@@ -22,7 +22,7 @@ public class ScrollLinearLayoutManager extends LinearLayoutManager {
     public ScrollLinearLayoutManager(Context context) {
         super(context);
         this.contxt = context;
-        setSpeedSlow(5);
+        setSpeedSlow(4);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class ScrollLinearLayoutManager extends LinearLayoutManager {
         if(speed == Speed.SPEED_MEDIAN){
             setSpeedSlow(0);
         } else {
-            setSpeedSlow(5);
+            setSpeedSlow(4);
         }
     }
 

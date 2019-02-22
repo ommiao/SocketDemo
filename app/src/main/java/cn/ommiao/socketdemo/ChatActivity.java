@@ -3,6 +3,7 @@ package cn.ommiao.socketdemo;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -58,6 +59,7 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
         layoutManager.setSpeed(ScrollLinearLayoutManager.Speed.SPEED_SLOW);
         mBinding.rvMessage.setLayoutManager(layoutManager);
         adapter = new MessageAdapter(messages);
+        mBinding.rvMessage.setItemAnimator(new DefaultItemAnimator());
         mBinding.rvMessage.setAdapter(adapter);
         mBinding.etMsg.addTextChangedListener(this);
         mBinding.btnSend.setOnClickListener(this);
