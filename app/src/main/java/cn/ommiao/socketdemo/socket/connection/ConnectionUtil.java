@@ -1,4 +1,4 @@
-package cn.ommiao.socketdemo.utils;
+package cn.ommiao.socketdemo.socket.connection;
 
 import com.orhanobut.logger.Logger;
 
@@ -14,10 +14,16 @@ import cn.ommiao.socketdemo.socket.Config;
 
 public class ConnectionUtil {
 
+    private Object lock = new Object();
+
+    private Socket socket;
+
     private BaseActivity context;
 
     private String ip;
     private int port;
+
+    private Client client;
 
     public ConnectionUtil create(BaseActivity context){
         this.context = context;
@@ -34,7 +40,16 @@ public class ConnectionUtil {
         return this;
     }
 
-    public void send(String msg, SocketConnectionListener listener){
+    public void connet(ConnectionListener listener){
+        new Thread(() -> {
+            socket = new Socket();
+            if(socket.isConnected()){
+                client = new Client(socket);
+            }
+        }).start();
+    }
+
+    public void send(String msg){
         new Thread(() -> {
             try {
                 Socket socket = new Socket(ip, port);
@@ -54,11 +69,7 @@ public class ConnectionUtil {
                         break;
                     }
                 }
-                if(listener != null){
-                    context.runOnUiThread(() -> {
-                        listener.onReceived(sb.toString().replace(Config.END, ""));
-                    });
-                }
+                //...
                 bufReader.close();
                 reader.close();
                 is.close();
@@ -71,9 +82,11 @@ public class ConnectionUtil {
     }
 
 
+    public interface ConnectionListener{
 
-    public interface SocketConnectionListener{
-        void onReceived(String msg);
+        void onConnected();
+        void onConnectFail();
+
     }
 
 }

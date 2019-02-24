@@ -1,4 +1,4 @@
-package cn.ommiao.socketdemo.socket;
+package cn.ommiao.socketdemo.socket.message;
 
 public class Action {
 
