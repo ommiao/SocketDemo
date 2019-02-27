@@ -16,6 +16,8 @@ import java.net.Socket;
 import java.util.Arrays;
 
 import cn.ommiao.socketdemo.socket.Config;
+import cn.ommiao.socketdemo.socket.message.HeartBeatWrapper;
+import cn.ommiao.socketdemo.socket.message.MessageBase;
 
 public class MessageService extends Service {
 
@@ -25,6 +27,9 @@ public class MessageService extends Service {
 
     private WeakReference<Socket> mSocket;
     private ReadThread mReadThread;
+
+    private static HeartBeatWrapper HEART_BEAT_WRAPPER;
+    private static MessageBase HEART_BEAT_MESSAGE;
 
 
     @Nullable
@@ -44,7 +49,12 @@ public class MessageService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        initHeartBeatData();
         new InitSocketThread().start();
+    }
+
+    private void initHeartBeatData() {
+
     }
 
     private Handler mHandler = new Handler();
@@ -74,18 +84,19 @@ public class MessageService extends Service {
             return false;
         }
         Socket socket = mSocket.get();
-        try {
-            if(!socket.isClosed() && !socket.isOutputShutdown()){
-                OutputStream os = socket.getOutputStream();
-                os.write(message.getBytes());
-                os.flush();
-                sendTime = System.currentTimeMillis();
-                Logger.d("Message Send Success at " + sendTime + ".");
-            } else {
-                return false;
-            }
-        } catch (IOException e){
-            e.printStackTrace();
+        if(!socket.isClosed() && !socket.isOutputShutdown()){
+            new Thread(() -> {
+                try {
+                    OutputStream os = socket.getOutputStream();
+                    os.write(message.getBytes());
+                    os.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+            sendTime = System.currentTimeMillis();
+            Logger.d("Message Send at " + sendTime + ".");
+        } else {
             return false;
         }
         return true;
@@ -152,7 +163,7 @@ public class MessageService extends Service {
                     while (!socket.isClosed() && !socket.isInputShutdown()
                             && isStart && ((length = is.read(buffer)) != -1)){
                         if(length > 0){
-                            String message = new String(Arrays.copyOf(buffer, length)).trim().replace(Config.END, "");
+                            String message = new String(Arrays.copyOf(buffer, length)).trim();
                             Logger.d("Reveived Message: " + message);
                             if("@heartbeat".equals(message)){
                                 Logger.d("@heartbeat");
