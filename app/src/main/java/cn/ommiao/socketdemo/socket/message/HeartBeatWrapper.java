@@ -1,6 +1,6 @@
 package cn.ommiao.socketdemo.socket.message;
 
-public class HeartBeatWrapper extends MessageWrapper<WrapperBody> {
+public class HeartBeatWrapper extends MessageWrapper<HeartBeatWrapper, WrapperBody> {
 
 
     @Override

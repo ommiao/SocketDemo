@@ -1,6 +1,6 @@
 package cn.ommiao.socketdemo.socket.message;
 
-public abstract class MessageWrapper<T extends WrapperBody> {
+public abstract class MessageWrapper<M extends MessageWrapper<M, T>, T extends WrapperBody> {
 
     private MessageBase message = new MessageBase();
 
@@ -16,17 +16,18 @@ public abstract class MessageWrapper<T extends WrapperBody> {
         this.message = MessageBase.fromJson(message, MessageBase.class);
     }
 
-    public String getMessageString(){
+    public String getStringMessage(){
         return message.toJson();
     }
 
-    public T getwrapperBody(){
+    public T getWrapperBody(){
         return T.fromJson(message.getBody(), classOfT());
     }
 
-    public MessageWrapper<T> action(String action){
+    @SuppressWarnings("unchecked")
+    public M action(String action){
         message.setAction(action);
-        return this;
+        return (M)this;
     }
 
     public String getAction(){

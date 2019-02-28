@@ -16,8 +16,8 @@ import java.net.Socket;
 import java.util.Arrays;
 
 import cn.ommiao.socketdemo.socket.Config;
+import cn.ommiao.socketdemo.socket.message.Action;
 import cn.ommiao.socketdemo.socket.message.HeartBeatWrapper;
-import cn.ommiao.socketdemo.socket.message.MessageBase;
 
 public class MessageService extends Service {
 
@@ -29,8 +29,6 @@ public class MessageService extends Service {
     private ReadThread mReadThread;
 
     private static HeartBeatWrapper HEART_BEAT_WRAPPER;
-    private static MessageBase HEART_BEAT_MESSAGE;
-
 
     @Nullable
     @Override
@@ -54,7 +52,8 @@ public class MessageService extends Service {
     }
 
     private void initHeartBeatData() {
-
+        HEART_BEAT_WRAPPER = new HeartBeatWrapper().action(Action.ACTION_HEART_BEAT);
+        Logger.d(HEART_BEAT_WRAPPER.getStringMessage());
     }
 
     private Handler mHandler = new Handler();
@@ -63,7 +62,7 @@ public class MessageService extends Service {
         @Override
         public void run() {
             if(needHeartBeat()){
-                boolean success = sendMsg("@heartbeat");
+                boolean success = sendMsg(HEART_BEAT_WRAPPER.getStringMessage());
                 if(!success){
                     mHandler.removeCallbacks(heartBeatRunnable);
                     mReadThread.release();
