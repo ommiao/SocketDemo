@@ -4,7 +4,7 @@ import cn.ommiao.socketdemo.socket.message.base.WrapperBody;
 
 public class MessageBody extends WrapperBody {
 
-    private String Content;
+    private String Content, Nickname;
 
     public String getContent() {
         return Content;
@@ -12,5 +12,13 @@ public class MessageBody extends WrapperBody {
 
     public void setContent(String content) {
         Content = content;
+    }
+
+    public String getNickname() {
+        return Nickname;
+    }
+
+    public void setNickname(String nickname) {
+        Nickname = nickname;
     }
 }

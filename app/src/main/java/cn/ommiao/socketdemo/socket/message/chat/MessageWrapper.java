@@ -21,6 +21,10 @@ public class MessageWrapper extends AbstractMessageWrapper<MessageWrapper, Messa
         return getWrapperBody().getContent();
     }
 
+    public String getNickname(){
+        return getWrapperBody().getNickname();
+    }
+
     @Override
     public Class<MessageBody> classOfT() {
         return MessageBody.class;

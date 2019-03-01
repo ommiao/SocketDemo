@@ -12,7 +12,6 @@ import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 
 import com.gyf.barlibrary.ImmersionBar;
-import com.orhanobut.logger.Logger;
 
 import cn.ommiao.socketdemo.databinding.ActivityMainBinding;
 import cn.ommiao.socketdemo.socket.message.chat.MessageBody;
@@ -27,13 +26,6 @@ import cn.ommiao.socketdemo.utils.ToastUtil;
 public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     private String nickname;
-
-    private Intent mServiceIntent;
-    private IMessageService iMessageService;
-
-    private IntentFilter mIntentFilter;
-    private LocalBroadcastManager mLocalBroadcastManager;
-    private MessageReceiver mReciver;
 
     @Override
     protected void immersionBar() {
@@ -52,48 +44,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         mBinding.tvServer.setText(server);
     }
 
-    @Override
-    protected void initDatas() {
-        mServiceIntent = new Intent(this, MessageService.class);
-        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
-        mReciver = new MessageReceiver();
-        mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(Action.ACTION_HEART_BEAT);
-        mIntentFilter.addAction(Action.ACTION_MESSAGE_SEND);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        bindService(mServiceIntent, conn, BIND_AUTO_CREATE);
-        mLocalBroadcastManager.registerReceiver(mReciver, mIntentFilter);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unbindService(conn);
-        mLocalBroadcastManager.unregisterReceiver(mReciver);
-    }
-
     private void startChat() {
         if(!isDataChecked()){
             return;
         }
-        //ChatActivity.start(this, nickname);
-        testScoket();
-    }
-
-    private void testScoket() {
-        MessageBody body = new MessageBody();
-        body.setContent(nickname);
-        MessageWrapper wrapper = new MessageWrapper().action(Action.ACTION_MESSAGE_SEND);
-        wrapper.setBody(body);
-        try {
-            iMessageService.sendMessage(wrapper.getStringMessage());
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
+        ChatActivity.start(this, nickname);
     }
 
     private boolean isDataChecked(){
@@ -103,43 +58,5 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
             return false;
         }
         return true;
-    }
-
-    private ServiceConnection conn = new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            iMessageService = IMessageService.Stub.asInterface(iBinder);
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            iMessageService = null;
-        }
-    };
-
-    class MessageReceiver extends BroadcastReceiver{
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            String message = intent.getStringExtra("message");
-            assert action != null;
-            switch (action){
-                case Action.ACTION_HEART_BEAT:
-                    handleHeartBeat(new HeartBeatWrapper(message));
-                    break;
-                case Action.ACTION_MESSAGE_SEND:
-                    handleMessageReceived(new MessageWrapper(message));
-                    break;
-            }
-        }
-    }
-
-    private void handleHeartBeat(HeartBeatWrapper wrapper){
-
-    }
-
-    private void handleMessageReceived(MessageWrapper wrapper){
-        ToastUtil.show(wrapper.getContent());
     }
 }

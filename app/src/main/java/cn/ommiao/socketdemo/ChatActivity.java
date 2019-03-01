@@ -1,8 +1,15 @@
 package cn.ommiao.socketdemo;
 
+import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.ServiceConnection;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -23,6 +30,12 @@ import cn.ommiao.socketdemo.adapter.MessageAdapter;
 import cn.ommiao.socketdemo.databinding.ActivityChatBinding;
 import cn.ommiao.socketdemo.entity.MessageEntity;
 import cn.ommiao.socketdemo.other.ScrollLinearLayoutManager;
+import cn.ommiao.socketdemo.socket.message.Action;
+import cn.ommiao.socketdemo.socket.message.chat.MessageBody;
+import cn.ommiao.socketdemo.socket.message.chat.MessageWrapper;
+import cn.ommiao.socketdemo.socket.message.heartbeat.HeartBeatWrapper;
+import cn.ommiao.socketdemo.socket.service.IMessageService;
+import cn.ommiao.socketdemo.socket.service.MessageService;
 import cn.ommiao.socketdemo.utils.ToastUtil;
 
 public class ChatActivity extends BaseActivity<ActivityChatBinding> implements TextWatcher, View.OnClickListener {
@@ -31,6 +44,13 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
 
     private MessageAdapter adapter;
     private ArrayList<MessageEntity> messages = new ArrayList<>();
+
+    private Intent mServiceIntent;
+    private IMessageService iMessageService;
+
+    private IntentFilter mIntentFilter;
+    private LocalBroadcastManager mLocalBroadcastManager;
+    private MessageReceiver mReciver;
 
     public static void start(Context context, String nickname) {
         Intent starter = new Intent(context, ChatActivity.class);
@@ -100,7 +120,26 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
 
     @Override
     protected void initDatas() {
+        mServiceIntent = new Intent(this, MessageService.class);
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
+        mReciver = new MessageReceiver();
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(Action.ACTION_HEART_BEAT);
+        mIntentFilter.addAction(Action.ACTION_MESSAGE_SEND);
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        bindService(mServiceIntent, conn, BIND_AUTO_CREATE);
+        mLocalBroadcastManager.registerReceiver(mReciver, mIntentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unbindService(conn);
+        mLocalBroadcastManager.unregisterReceiver(mReciver);
     }
 
 
@@ -125,7 +164,21 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
         adapter.notifyItemInserted(messages.size() - 1);
         mBinding.rvMessage.smoothScrollToPosition(messages.size());
         resetEtMsg();
+        sendSocketMessage(content);
         //addVirtualIn();
+    }
+
+    private void sendSocketMessage(String msg) {
+        MessageBody body = new MessageBody();
+        body.setContent(msg);
+        body.setNickname(nickname);
+        MessageWrapper wrapper = new MessageWrapper().action(Action.ACTION_MESSAGE_SEND);
+        wrapper.setBody(body);
+        try {
+            iMessageService.sendMessage(wrapper.getStringMessage());
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
     }
 
     private void addVirtualIn() {
@@ -170,6 +223,52 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
     @Override
     public void afterTextChanged(Editable s) {
 
+    }
+
+    private ServiceConnection conn = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            iMessageService = IMessageService.Stub.asInterface(iBinder);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            iMessageService = null;
+        }
+    };
+
+    class MessageReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            String message = intent.getStringExtra("message");
+            assert action != null;
+            switch (action){
+                case Action.ACTION_HEART_BEAT:
+                    handleHeartBeat(new HeartBeatWrapper(message));
+                    break;
+                case Action.ACTION_MESSAGE_SEND:
+                    handleMessageReceived(new MessageWrapper(message));
+                    break;
+            }
+        }
+    }
+
+    private void handleHeartBeat(HeartBeatWrapper wrapper){
+
+    }
+
+    private void handleMessageReceived(MessageWrapper wrapper){
+        MessageEntity entity = new MessageEntity();
+        entity.setType(MessageEntity.TYPE_IN);
+        entity.setContent(wrapper.getContent());
+        entity.setNickname(wrapper.getNickname());
+        SimpleDateFormat sf = new SimpleDateFormat("hh:mm", Locale.CHINESE);
+        entity.setTime(sf.format(new Date()));
+        messages.add(entity);
+        adapter.notifyItemInserted(messages.size() - 1);
+        mBinding.rvMessage.smoothScrollToPosition(messages.size());
     }
 
 }
