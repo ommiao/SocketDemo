@@ -1,40 +1,40 @@
-package cn.ommiao.socketdemo.socket.message;
+package cn.ommiao.socketdemo.socket.message.base;
 
 import cn.ommiao.socketdemo.entity.JavaBean;
 
 public class MessageBase extends JavaBean{
 
-    private String msgNo, action, body, replyTo;
+    private String MsgNo, Action, Body, ReplyTo;
 
     public String getMsgNo() {
-        return msgNo;
+        return MsgNo;
     }
 
     public void setMsgNo(String msgNo) {
-        this.msgNo = msgNo;
+        MsgNo = msgNo;
     }
 
     public String getAction() {
-        return action;
+        return Action;
     }
 
     public void setAction(String action) {
-        this.action = action;
+        Action = action;
     }
 
     public String getBody() {
-        return body;
+        return Body;
     }
 
     public void setBody(String body) {
-        this.body = body;
+        Body = body;
     }
 
     public String getReplyTo() {
-        return replyTo;
+        return ReplyTo;
     }
 
     public void setReplyTo(String replyTo) {
-        this.replyTo = replyTo;
+        ReplyTo = replyTo;
     }
 }

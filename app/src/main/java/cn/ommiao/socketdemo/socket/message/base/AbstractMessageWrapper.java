@@ -1,18 +1,18 @@
-package cn.ommiao.socketdemo.socket.message;
+package cn.ommiao.socketdemo.socket.message.base;
 
-public abstract class MessageWrapper<M extends MessageWrapper<M, T>, T extends WrapperBody> {
+public abstract class AbstractMessageWrapper<M extends AbstractMessageWrapper<M, T>, T extends WrapperBody> {
 
     private MessageBase message = new MessageBase();
 
-    public MessageWrapper(){
+    public AbstractMessageWrapper(){
 
     }
 
-    public MessageWrapper(T body){
+    public AbstractMessageWrapper(T body){
         message.setBody(body.toJson());
     }
 
-    public MessageWrapper(String message){
+    public AbstractMessageWrapper(String message){
         this.message = MessageBase.fromJson(message, MessageBase.class);
     }
 
@@ -32,6 +32,10 @@ public abstract class MessageWrapper<M extends MessageWrapper<M, T>, T extends W
 
     public String getAction(){
         return message.getAction();
+    }
+
+    public void setBody(T body){
+        message.setBody(body.toJson());
     }
 
     public abstract Class<T> classOfT();

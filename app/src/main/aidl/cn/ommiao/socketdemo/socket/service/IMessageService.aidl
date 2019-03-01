@@ -1,4 +1,4 @@
-package cn.ommiao.socketdemo.service;
+package cn.ommiao.socketdemo.socket.service;
 
 interface IMessageService {
 

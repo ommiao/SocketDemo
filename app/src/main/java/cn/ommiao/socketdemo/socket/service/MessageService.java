@@ -1,10 +1,11 @@
-package cn.ommiao.socketdemo.service;
+package cn.ommiao.socketdemo.socket.service;
 
 import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 
 import com.orhanobut.logger.Logger;
 
@@ -17,7 +18,8 @@ import java.util.Arrays;
 
 import cn.ommiao.socketdemo.socket.Config;
 import cn.ommiao.socketdemo.socket.message.Action;
-import cn.ommiao.socketdemo.socket.message.HeartBeatWrapper;
+import cn.ommiao.socketdemo.socket.message.heartbeat.HeartBeatWrapper;
+import cn.ommiao.socketdemo.socket.message.base.MessageBase;
 
 public class MessageService extends Service {
 
@@ -29,6 +31,8 @@ public class MessageService extends Service {
     private ReadThread mReadThread;
 
     private static HeartBeatWrapper HEART_BEAT_WRAPPER;
+
+    private LocalBroadcastManager mLocalBroadcastManager;
 
     @Nullable
     @Override
@@ -48,12 +52,23 @@ public class MessageService extends Service {
     public void onCreate() {
         super.onCreate();
         initHeartBeatData();
-        new InitSocketThread().start();
+        startSocket();
+        initLocalBroadcast();
+
     }
 
     private void initHeartBeatData() {
         HEART_BEAT_WRAPPER = new HeartBeatWrapper().action(Action.ACTION_HEART_BEAT);
         Logger.d(HEART_BEAT_WRAPPER.getStringMessage());
+    }
+
+
+    private void startSocket() {
+        new InitSocketThread().start();
+    }
+
+    private void initLocalBroadcast() {
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
     }
 
     private Handler mHandler = new Handler();
@@ -94,7 +109,7 @@ public class MessageService extends Service {
                 }
             }).start();
             sendTime = System.currentTimeMillis();
-            Logger.d("Message Send at " + sendTime + ".");
+            Logger.d("Message Send: " + message + ".");
         } else {
             return false;
         }
@@ -164,10 +179,15 @@ public class MessageService extends Service {
                         if(length > 0){
                             String message = new String(Arrays.copyOf(buffer, length)).trim();
                             Logger.d("Reveived Message: " + message);
-                            if("@heartbeat".equals(message)){
-                                Logger.d("@heartbeat");
+                            MessageBase base = MessageBase.fromJson(message, MessageBase.class);
+                            if(Action.ACTION_HEART_BEAT.equals(base.getAction())){
+                                Intent intent=new Intent(Action.ACTION_HEART_BEAT);
+                                intent.putExtra("message", message);
+                                mLocalBroadcastManager.sendBroadcast(intent);
                             } else {
-
+                                Intent intent=new Intent(Action.ACTION_MESSAGE_SEND);
+                                intent.putExtra("message", message);
+                                mLocalBroadcastManager.sendBroadcast(intent);
                             }
                         }
                     }

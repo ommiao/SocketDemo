@@ -34,7 +34,7 @@
         </activity>
         <activity android:name=".ChatActivity" />
 
-        <service android:name=".service.MessageService" />
+        <service android:name=".socket.service.MessageService" />
     </application>
 
 </manifest>

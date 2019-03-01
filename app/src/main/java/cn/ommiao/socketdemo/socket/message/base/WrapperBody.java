@@ -1,4 +1,4 @@
-package cn.ommiao.socketdemo.socket.message;
+package cn.ommiao.socketdemo.socket.message.base;
 
 import cn.ommiao.socketdemo.entity.JavaBean;
 
