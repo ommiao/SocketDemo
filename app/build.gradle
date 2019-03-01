@@ -23,6 +23,15 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    android.applicationVariants.all { variant ->
+        variant.outputs.all {
+            outputFileName = "socket-demo-release-${versionName}-${releaseTime()}.apk"
+        }
+    }
+}
+
+static def releaseTime() {
+    return new Date().format("yyyyMMddhhmmss", TimeZone.getTimeZone("UTC"))
 }
 
 dependencies {
