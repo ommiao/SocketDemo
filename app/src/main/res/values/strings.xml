@@ -6,4 +6,5 @@
     <string name="chat_toolbar_people">人员</string>
     <string name="chat_toolbar_exit">退出</string>
     <string name="chat_msg_input_hint">Message</string>
+    <string name="chat_loading_connecting">正在建立连接</string>
 </resources>

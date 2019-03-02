@@ -15,15 +15,18 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.UUID;
 
 import cn.ommiao.socketdemo.socket.Config;
-import cn.ommiao.socketdemo.socket.message.Action;
+import cn.ommiao.socketdemo.socket.message.ActionDefine;
 import cn.ommiao.socketdemo.socket.message.heartbeat.HeartBeatWrapper;
 import cn.ommiao.socketdemo.socket.message.base.MessageBase;
 
 public class MessageService extends Service {
 
     private static final long HEART_BEAT_RATE = 3 * 1000;
+
+    public static String userCode = UUID.randomUUID().toString();
 
     private long sendTime = 0L;
 
@@ -33,6 +36,8 @@ public class MessageService extends Service {
     private static HeartBeatWrapper HEART_BEAT_WRAPPER;
 
     private LocalBroadcastManager mLocalBroadcastManager;
+
+    private int retryTime = 0;
 
     @Nullable
     @Override
@@ -58,7 +63,7 @@ public class MessageService extends Service {
     }
 
     private void initHeartBeatData() {
-        HEART_BEAT_WRAPPER = new HeartBeatWrapper().action(Action.ACTION_HEART_BEAT);
+        HEART_BEAT_WRAPPER = new HeartBeatWrapper().action(ActionDefine.ACTION_HEART_BEAT);
         Logger.d(HEART_BEAT_WRAPPER.getStringMessage());
     }
 
@@ -79,6 +84,11 @@ public class MessageService extends Service {
             if(needHeartBeat()){
                 boolean success = sendMsg(HEART_BEAT_WRAPPER.getStringMessage());
                 if(!success){
+                    retryTime++;
+                    if(retryTime == 3){
+                        Intent intent = new Intent(ActionDefine.ACTION_DISCONNECTED);
+                        mLocalBroadcastManager.sendBroadcast(intent);
+                    }
                     mHandler.removeCallbacks(heartBeatRunnable);
                     mReadThread.release();
                     releaseSocket(mSocket);
@@ -128,7 +138,7 @@ public class MessageService extends Service {
         try {
             if(mSocket != null){
                 Socket socket = mSocket.get();
-                if(!socket.isClosed()){
+                if(socket != null && !socket.isClosed()){
                     socket.close();
                 }
                 socket = null;
@@ -160,7 +170,7 @@ public class MessageService extends Service {
             mWeakSocket = new WeakReference<>(socket);
         }
 
-        public void release(){
+        void release(){
             isStart = false;
             releaseSocket(mWeakSocket);
         }
@@ -180,15 +190,13 @@ public class MessageService extends Service {
                             String message = new String(Arrays.copyOf(buffer, length)).trim();
                             Logger.d("Reveived Message: " + message);
                             MessageBase base = MessageBase.fromJson(message, MessageBase.class);
-                            if(Action.ACTION_HEART_BEAT.equals(base.getAction())){
-                                Intent intent=new Intent(Action.ACTION_HEART_BEAT);
-                                intent.putExtra("message", message);
-                                mLocalBroadcastManager.sendBroadcast(intent);
-                            } else {
-                                Intent intent=new Intent(Action.ACTION_MESSAGE_SEND);
-                                intent.putExtra("message", message);
-                                mLocalBroadcastManager.sendBroadcast(intent);
+                            String action = base.getAction();
+                            if(ActionDefine.ACTION_HEART_BEAT.equals(action)){
+                                retryTime = 0;
                             }
+                            Intent intent = new Intent(action);
+                            intent.putExtra("message", message);
+                            mLocalBroadcastManager.sendBroadcast(intent);
                         }
                     }
                 } catch (IOException e) {
@@ -197,5 +205,13 @@ public class MessageService extends Service {
 
             }
         }
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        mHandler.removeCallbacks(heartBeatRunnable);
+        mReadThread.release();
+        releaseSocket(mSocket);
+        return true;
     }
 }

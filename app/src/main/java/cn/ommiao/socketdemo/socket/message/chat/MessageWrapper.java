@@ -22,7 +22,7 @@ public class MessageWrapper extends AbstractMessageWrapper<MessageWrapper, Messa
     }
 
     public String getNickname(){
-        return getWrapperBody().getNickname();
+        return getWrapperBody().getUser().getNickname();
     }
 
     @Override

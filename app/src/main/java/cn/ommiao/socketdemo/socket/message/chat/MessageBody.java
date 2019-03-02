@@ -1,10 +1,12 @@
 package cn.ommiao.socketdemo.socket.message.chat;
 
 import cn.ommiao.socketdemo.socket.message.base.WrapperBody;
+import cn.ommiao.socketdemo.socket.message.user.User;
 
 public class MessageBody extends WrapperBody {
 
-    private String Content, Nickname;
+    private String Content;
+    private User User;
 
     public String getContent() {
         return Content;
@@ -14,11 +16,11 @@ public class MessageBody extends WrapperBody {
         Content = content;
     }
 
-    public String getNickname() {
-        return Nickname;
+    public User getUser() {
+        return User;
     }
 
-    public void setNickname(String nickname) {
-        Nickname = nickname;
+    public void setUser(User user) {
+        User = user;
     }
 }

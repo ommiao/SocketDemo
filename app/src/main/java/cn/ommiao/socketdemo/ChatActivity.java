@@ -24,21 +24,28 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Random;
 
 import cn.ommiao.socketdemo.adapter.MessageAdapter;
 import cn.ommiao.socketdemo.databinding.ActivityChatBinding;
 import cn.ommiao.socketdemo.entity.MessageEntity;
 import cn.ommiao.socketdemo.other.ScrollLinearLayoutManager;
-import cn.ommiao.socketdemo.socket.message.Action;
+import cn.ommiao.socketdemo.socket.message.ActionDefine;
 import cn.ommiao.socketdemo.socket.message.chat.MessageBody;
 import cn.ommiao.socketdemo.socket.message.chat.MessageWrapper;
 import cn.ommiao.socketdemo.socket.message.heartbeat.HeartBeatWrapper;
+import cn.ommiao.socketdemo.socket.message.user.EventDefine;
+import cn.ommiao.socketdemo.socket.message.user.User;
+import cn.ommiao.socketdemo.socket.message.user.UserBody;
+import cn.ommiao.socketdemo.socket.message.user.UserWrapper;
 import cn.ommiao.socketdemo.socket.service.IMessageService;
 import cn.ommiao.socketdemo.socket.service.MessageService;
 import cn.ommiao.socketdemo.utils.ToastUtil;
 
 public class ChatActivity extends BaseActivity<ActivityChatBinding> implements TextWatcher, View.OnClickListener {
+
+    private enum ConnectionStatus{
+        Unconnected, Connecting, Connected, Disconnected
+    }
 
     private String nickname;
 
@@ -51,6 +58,8 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
     private IntentFilter mIntentFilter;
     private LocalBroadcastManager mLocalBroadcastManager;
     private MessageReceiver mReciver;
+
+    private ConnectionStatus status = ConnectionStatus.Unconnected;
 
     public static void start(Context context, String nickname) {
         Intent starter = new Intent(context, ChatActivity.class);
@@ -97,6 +106,66 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
                 }
             }
         });
+        onConnecting();
+    }
+
+    private void onConnecting() {
+        mBinding.flLoading.setVisibility(View.VISIBLE);
+        mBinding.tvTips.setText("正在建立连接");
+    }
+
+    private void onLogon(){
+        mBinding.flLoading.setVisibility(View.VISIBLE);
+        mBinding.tvTips.setText("正在加入群聊");
+    }
+
+    private void onLogonSuccess(){
+        mBinding.flLoading.setVisibility(View.VISIBLE);
+        mBinding.tvTips.setText("加入群聊成功");
+        new Thread(() -> {
+            try {
+                Thread.sleep(1500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            runOnUiThread(() -> mBinding.flLoading.setVisibility(View.INVISIBLE));
+        });
+    }
+
+    private void onLogout(){
+        mBinding.flLoading.setVisibility(View.VISIBLE);
+        mBinding.tvTips.setText("正在退出群聊");
+    }
+
+    private void onLogoutSuccess(){
+        mBinding.flLoading.setVisibility(View.VISIBLE);
+        mBinding.tvTips.setText("退出群聊成功");
+        new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            finish();
+        }).start();
+    }
+
+    private void onDisconnected(){
+        mBinding.flLoading.setVisibility(View.VISIBLE);
+        mBinding.tvTips.setText("掉线重连中...");
+    }
+
+    private void onReconnected(){
+        mBinding.flLoading.setVisibility(View.VISIBLE);
+        mBinding.tvTips.setText("重连成功");
+        new Thread(() -> {
+            try {
+                Thread.sleep(1500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            runOnUiThread(() -> mBinding.flLoading.setVisibility(View.INVISIBLE));
+        }).start();
     }
 
     @Override
@@ -124,8 +193,8 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
         mReciver = new MessageReceiver();
         mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(Action.ACTION_HEART_BEAT);
-        mIntentFilter.addAction(Action.ACTION_MESSAGE_SEND);
+        mIntentFilter.addAction(ActionDefine.ACTION_HEART_BEAT);
+        mIntentFilter.addAction(ActionDefine.ACTION_MESSAGE_SEND);
     }
 
     @Override
@@ -133,15 +202,16 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
         super.onStart();
         bindService(mServiceIntent, conn, BIND_AUTO_CREATE);
         mLocalBroadcastManager.registerReceiver(mReciver, mIntentFilter);
+        status = ConnectionStatus.Connecting;
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
+    protected void onDestroy() {
+        super.onDestroy();
         unbindService(conn);
+        stopService(mServiceIntent);
         mLocalBroadcastManager.unregisterReceiver(mReciver);
     }
-
 
     @Override
     public void onClick(View v) {
@@ -171,8 +241,11 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
     private void sendSocketMessage(String msg) {
         MessageBody body = new MessageBody();
         body.setContent(msg);
-        body.setNickname(nickname);
-        MessageWrapper wrapper = new MessageWrapper().action(Action.ACTION_MESSAGE_SEND);
+        User user = new User();
+        user.setUserCode(MessageService.userCode);
+        user.setNickname(nickname);
+        body.setUser(user);
+        MessageWrapper wrapper = new MessageWrapper().action(ActionDefine.ACTION_MESSAGE_SEND);
         wrapper.setBody(body);
         try {
             iMessageService.sendMessage(wrapper.getStringMessage());
@@ -238,25 +311,67 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
     };
 
     class MessageReceiver extends BroadcastReceiver {
-
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             String message = intent.getStringExtra("message");
             assert action != null;
             switch (action){
-                case Action.ACTION_HEART_BEAT:
+                case ActionDefine.ACTION_HEART_BEAT:
                     handleHeartBeat(new HeartBeatWrapper(message));
                     break;
-                case Action.ACTION_MESSAGE_SEND:
+                case ActionDefine.ACTION_MESSAGE_SEND:
                     handleMessageReceived(new MessageWrapper(message));
+                    break;
+                case ActionDefine.ACTION_DISCONNECTED:
+                    handleDisconnected();
+                    break;
+                case ActionDefine.ACTION_USER_CHANGED:
+                    handleUserChanged(new UserWrapper(message));
                     break;
             }
         }
+
+
+    }
+    private void handleUserChanged(UserWrapper wrapper) {
+        UserBody body = wrapper.getWrapperBody();
+        if(body.isLogonSuccess()){ //加入群聊成功
+            handleLogonSuccess(body.getCurrentUsers());
+        } else if(body.isLogoutSuccess()){ //退出群聊成功
+            handleLogoutSuccess();
+        } else if(body.isUserAdded()){ //用户增加
+            handleUserAdded(body.getChangedUser());
+        } else if(body.isUserQuited()){ //用户退出
+            handleUserQuited(body.getChangedUser());
+        }
+    }
+
+    private void handleLogonSuccess(ArrayList<User> currentUsers) {
+
+    }
+
+    private void handleLogoutSuccess() {
+
+    }
+
+    private void handleUserAdded(User changedUser) {
+
+    }
+
+    private void handleUserQuited(User changedUser) {
+
+    }
+
+    private void handleDisconnected() {
+        status = ConnectionStatus.Disconnected;
     }
 
     private void handleHeartBeat(HeartBeatWrapper wrapper){
-
+        if(status != ConnectionStatus.Connected){
+            logon();
+        }
+        status = ConnectionStatus.Connected;
     }
 
     private void handleMessageReceived(MessageWrapper wrapper){
@@ -271,4 +386,15 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
         mBinding.rvMessage.smoothScrollToPosition(messages.size());
     }
 
+    private void logon() {
+        onLogon();
+        UserBody body = new UserBody();
+        User user = new User();
+        user.setNickname(nickname);
+        user.setUserCode(MessageService.userCode);
+        body.setChangedUser(user);
+        body.setEvent(EventDefine.EVENT_USER_LOGON);
+        UserWrapper wrapper = new UserWrapper().action(ActionDefine.ACTION_USER_CHANGED);
+        sendSocketMessage(wrapper.getStringMessage());
+    }
 }
