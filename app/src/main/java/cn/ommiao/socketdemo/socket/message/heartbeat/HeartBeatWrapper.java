@@ -1,9 +1,8 @@
 package cn.ommiao.socketdemo.socket.message.heartbeat;
 
 import cn.ommiao.socketdemo.socket.message.base.AbstractMessageWrapper;
-import cn.ommiao.socketdemo.socket.message.base.WrapperBody;
 
-public class HeartBeatWrapper extends AbstractMessageWrapper<HeartBeatWrapper, WrapperBody> {
+public class HeartBeatWrapper extends AbstractMessageWrapper<HeartBeatWrapper, HeartBeatBody> {
 
     public HeartBeatWrapper(String message) {
         super(message);
@@ -14,7 +13,7 @@ public class HeartBeatWrapper extends AbstractMessageWrapper<HeartBeatWrapper, W
     }
 
     @Override
-    public Class<WrapperBody> classOfT() {
-        return WrapperBody.class;
+    public Class<HeartBeatBody> classOfT() {
+        return HeartBeatBody.class;
     }
 }

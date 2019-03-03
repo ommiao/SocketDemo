@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
+<menu xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/toolbar_people"
+        android:id="@+id/toolbar_friend"
         android:icon="@drawable/ic_people_online"
-        android:title="@string/chat_toolbar_people"
-        app:showAsAction="ifRoom"/>
+        android:title="@string/chat_toolbar_friend"
+        app:showAsAction="always"
+        tools:ignore="AlwaysShowAction" />
 
     <item
         android:id="@+id/toolbar_exit"
         android:icon="@drawable/ic_exit"
         android:title="@string/chat_toolbar_exit"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="always"/>
 
 </menu>

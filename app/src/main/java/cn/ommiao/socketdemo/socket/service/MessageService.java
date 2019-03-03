@@ -19,6 +19,7 @@ import java.util.UUID;
 
 import cn.ommiao.socketdemo.socket.Config;
 import cn.ommiao.socketdemo.socket.message.ActionDefine;
+import cn.ommiao.socketdemo.socket.message.heartbeat.HeartBeatBody;
 import cn.ommiao.socketdemo.socket.message.heartbeat.HeartBeatWrapper;
 import cn.ommiao.socketdemo.socket.message.base.MessageBase;
 
@@ -59,11 +60,13 @@ public class MessageService extends Service {
         initHeartBeatData();
         startSocket();
         initLocalBroadcast();
-
     }
 
     private void initHeartBeatData() {
         HEART_BEAT_WRAPPER = new HeartBeatWrapper().action(ActionDefine.ACTION_HEART_BEAT);
+        HeartBeatBody body = new HeartBeatBody();
+        body.setUserCode(MessageService.userCode);
+        HEART_BEAT_WRAPPER.setBody(body);
         Logger.d(HEART_BEAT_WRAPPER.getStringMessage());
     }
 
@@ -90,7 +93,9 @@ public class MessageService extends Service {
                         mLocalBroadcastManager.sendBroadcast(intent);
                     }
                     mHandler.removeCallbacks(heartBeatRunnable);
-                    mReadThread.release();
+                    if(mReadThread != null){
+                        mReadThread.release();
+                    }
                     releaseSocket(mSocket);
                     new InitSocketThread().start();
                 }
@@ -210,7 +215,9 @@ public class MessageService extends Service {
     @Override
     public boolean onUnbind(Intent intent) {
         mHandler.removeCallbacks(heartBeatRunnable);
-        mReadThread.release();
+        if(mReadThread != null){
+            mReadThread.release();
+        }
         releaseSocket(mSocket);
         return true;
     }

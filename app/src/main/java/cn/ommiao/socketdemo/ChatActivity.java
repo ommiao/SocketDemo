@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.gyf.barlibrary.ImmersionBar;
+import com.orhanobut.logger.Logger;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -61,6 +62,8 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
 
     private ConnectionStatus status = ConnectionStatus.Unconnected;
 
+    private MenuItem friendItem, exitItem;
+
     public static void start(Context context, String nickname) {
         Intent starter = new Intent(context, ChatActivity.class);
         starter.putExtra("nickname", nickname);
@@ -92,6 +95,7 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
         mBinding.rvMessage.setAdapter(adapter);
         mBinding.etMsg.addTextChangedListener(this);
         mBinding.btnSend.setOnClickListener(this);
+        mBinding.btnSend.setEnabled(false);
         mBinding.rvMessage.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
@@ -129,7 +133,7 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
                 e.printStackTrace();
             }
             runOnUiThread(() -> mBinding.flLoading.setVisibility(View.INVISIBLE));
-        });
+        }).start();
     }
 
     private void onLogout(){
@@ -171,20 +175,29 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_chat_toolbar, menu);
+        friendItem = menu.findItem(R.id.toolbar_friend);
+        exitItem = menu.findItem(R.id.toolbar_exit);
+        friendItem.setEnabled(false);
+        exitItem.setEnabled(false);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
-            case R.id.toolbar_people:
-                ToastUtil.show(R.string.chat_toolbar_people);
+            case R.id.toolbar_friend:
+                ToastUtil.show(R.string.chat_toolbar_friend);
                 break;
             case R.id.toolbar_exit:
                 ToastUtil.show(R.string.chat_toolbar_exit);
                 break;
         }
         return true;
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     @Override
@@ -195,6 +208,8 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
         mIntentFilter = new IntentFilter();
         mIntentFilter.addAction(ActionDefine.ACTION_HEART_BEAT);
         mIntentFilter.addAction(ActionDefine.ACTION_MESSAGE_SEND);
+        mIntentFilter.addAction(ActionDefine.ACTION_USER_CHANGED);
+        mIntentFilter.addAction(ActionDefine.ACTION_DISCONNECTED);
     }
 
     @Override
@@ -234,21 +249,25 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
         adapter.notifyItemInserted(messages.size() - 1);
         mBinding.rvMessage.smoothScrollToPosition(messages.size());
         resetEtMsg();
-        sendSocketMessage(content);
+        sendChatMessage(content);
         //addVirtualIn();
     }
 
-    private void sendSocketMessage(String msg) {
+    private void sendChatMessage(String content) {
         MessageBody body = new MessageBody();
-        body.setContent(msg);
+        body.setContent(content);
         User user = new User();
         user.setUserCode(MessageService.userCode);
         user.setNickname(nickname);
         body.setUser(user);
         MessageWrapper wrapper = new MessageWrapper().action(ActionDefine.ACTION_MESSAGE_SEND);
         wrapper.setBody(body);
+        sendSocketMessage(wrapper.getStringMessage());
+    }
+
+    private void sendSocketMessage(String json){
         try {
-            iMessageService.sendMessage(wrapper.getStringMessage());
+            iMessageService.sendMessage(json);
         } catch (RemoteException e) {
             e.printStackTrace();
         }
@@ -348,7 +367,7 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
     }
 
     private void handleLogonSuccess(ArrayList<User> currentUsers) {
-
+        onLogonSuccess();
     }
 
     private void handleLogoutSuccess() {
@@ -395,6 +414,7 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
         body.setChangedUser(user);
         body.setEvent(EventDefine.EVENT_USER_LOGON);
         UserWrapper wrapper = new UserWrapper().action(ActionDefine.ACTION_USER_CHANGED);
+        wrapper.setBody(body);
         sendSocketMessage(wrapper.getStringMessage());
     }
 }

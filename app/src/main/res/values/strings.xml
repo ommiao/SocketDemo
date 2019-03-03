@@ -3,7 +3,7 @@
     <string name="chat_room">WeChat</string>
     <string name="nickname_required">Nickname required!</string>
     <string name="nickname_here">Nickname here.</string>
-    <string name="chat_toolbar_people">人员</string>
+    <string name="chat_toolbar_friend">群友</string>
     <string name="chat_toolbar_exit">退出</string>
     <string name="chat_msg_input_hint">Message</string>
     <string name="chat_loading_connecting">正在建立连接</string>
