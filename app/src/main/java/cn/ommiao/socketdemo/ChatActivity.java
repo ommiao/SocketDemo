@@ -202,7 +202,11 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
 
     @Override
     protected void initDatas() {
-        mServiceIntent = new Intent(this, MessageService.class);
+        initBroadcast();
+        bindService();
+    }
+
+    private void initBroadcast() {
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
         mReciver = new MessageReceiver();
         mIntentFilter = new IntentFilter();
@@ -212,9 +216,8 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
         mIntentFilter.addAction(ActionDefine.ACTION_DISCONNECTED);
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+    private void bindService(){
+        mServiceIntent = new Intent(this, MessageService.class);
         bindService(mServiceIntent, conn, BIND_AUTO_CREATE);
         mLocalBroadcastManager.registerReceiver(mReciver, mIntentFilter);
         status = ConnectionStatus.Connecting;

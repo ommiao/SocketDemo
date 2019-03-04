@@ -27,7 +27,7 @@ public class MessageService extends Service {
 
     private static final long HEART_BEAT_RATE = 3 * 1000;
 
-    public static String userCode = UUID.randomUUID().toString();
+    public static String userCode;
 
     private long sendTime = 0L;
 
@@ -57,9 +57,14 @@ public class MessageService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        initUserCode();
         initHeartBeatData();
         startSocket();
         initLocalBroadcast();
+    }
+
+    private void initUserCode() {
+        userCode = UUID.randomUUID().toString();
     }
 
     private void initHeartBeatData() {
