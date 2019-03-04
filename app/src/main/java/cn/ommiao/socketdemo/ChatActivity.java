@@ -126,9 +126,11 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
     private void onLogonSuccess(){
         mBinding.flLoading.setVisibility(View.VISIBLE);
         mBinding.tvTips.setText("加入群聊成功");
+        friendItem.setEnabled(true);
+        exitItem.setEnabled(true);
         new Thread(() -> {
             try {
-                Thread.sleep(1500);
+                Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -146,7 +148,7 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
         mBinding.tvTips.setText("退出群聊成功");
         new Thread(() -> {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(800);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -189,15 +191,27 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
                 ToastUtil.show(R.string.chat_toolbar_friend);
                 break;
             case R.id.toolbar_exit:
-                ToastUtil.show(R.string.chat_toolbar_exit);
+                onExitClick();
                 break;
         }
         return true;
     }
 
+    private void onExitClick() {
+        if(status != ConnectionStatus.Connected){
+            exit();
+        } else {
+            exit();
+        }
+    }
+
+    private void exit(){
+        logout();
+    }
+
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        onExitClick();
     }
 
     @Override
@@ -374,7 +388,7 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
     }
 
     private void handleLogoutSuccess() {
-
+        onLogoutSuccess();
     }
 
     private void handleUserAdded(User changedUser) {
@@ -416,6 +430,19 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
         user.setUserCode(MessageService.userCode);
         body.setChangedUser(user);
         body.setEvent(EventDefine.EVENT_USER_LOGON);
+        UserWrapper wrapper = new UserWrapper().action(ActionDefine.ACTION_USER_CHANGED);
+        wrapper.setBody(body);
+        sendSocketMessage(wrapper.getStringMessage());
+    }
+
+    private void logout(){
+        onLogout();
+        UserBody body = new UserBody();
+        User user = new User();
+        user.setNickname(nickname);
+        user.setUserCode(MessageService.userCode);
+        body.setChangedUser(user);
+        body.setEvent(EventDefine.EVENT_USER_LOGOUT);
         UserWrapper wrapper = new UserWrapper().action(ActionDefine.ACTION_USER_CHANGED);
         wrapper.setBody(body);
         sendSocketMessage(wrapper.getStringMessage());
