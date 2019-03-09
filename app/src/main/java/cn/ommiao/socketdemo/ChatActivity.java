@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.NonNull;
@@ -388,6 +389,7 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
     }
 
     private void handleLogoutSuccess() {
+        mHandler.removeCallbacks(logoutRunanable);
         onLogoutSuccess();
     }
 
@@ -446,5 +448,9 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
         UserWrapper wrapper = new UserWrapper().action(ActionDefine.ACTION_USER_CHANGED);
         wrapper.setBody(body);
         sendSocketMessage(wrapper.getStringMessage());
+        mHandler.postDelayed(logoutRunanable, 2000);
     }
+
+    private Handler mHandler = new Handler();
+    Runnable logoutRunanable = () -> runOnUiThread(this::onLogoutSuccess);
 }

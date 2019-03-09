@@ -26,6 +26,7 @@ import cn.ommiao.socketdemo.socket.message.base.MessageBase;
 public class MessageService extends Service {
 
     private static final long HEART_BEAT_RATE = 3 * 1000;
+    private static final long CONNECT_DELAY = 1 * 1000;
 
     public static String userCode;
 
@@ -141,7 +142,7 @@ public class MessageService extends Service {
         mSocket = new WeakReference<>(socket);
         mReadThread = new ReadThread(socket);
         mReadThread.start();
-        mHandler.postDelayed(heartBeatRunnable, HEART_BEAT_RATE);
+        mHandler.postDelayed(heartBeatRunnable, CONNECT_DELAY);
     }
 
     private void releaseSocket(WeakReference<Socket> mSocket){
