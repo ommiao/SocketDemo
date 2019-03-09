@@ -1,4 +1,4 @@
-package cn.ommiao.socketdemo;
+package cn.ommiao.socketdemo.ui;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -20,13 +20,13 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.gyf.barlibrary.ImmersionBar;
-import com.orhanobut.logger.Logger;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
+import cn.ommiao.socketdemo.R;
 import cn.ommiao.socketdemo.adapter.MessageAdapter;
 import cn.ommiao.socketdemo.databinding.ActivityChatBinding;
 import cn.ommiao.socketdemo.entity.MessageEntity;
@@ -44,6 +44,8 @@ import cn.ommiao.socketdemo.socket.service.MessageService;
 import cn.ommiao.socketdemo.utils.ToastUtil;
 
 public class ChatActivity extends BaseActivity<ActivityChatBinding> implements TextWatcher, View.OnClickListener {
+
+    private FriendsFragment friendsFragment;
 
     private enum ConnectionStatus{
         Unconnected, Connecting, Connected, Disconnected
@@ -65,6 +67,8 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
 
     private MenuItem friendItem, exitItem;
 
+    private ArrayList<User> users = new ArrayList<>();
+
     public static void start(Context context, String nickname) {
         Intent starter = new Intent(context, ChatActivity.class);
         starter.putExtra("nickname", nickname);
@@ -74,6 +78,10 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
     @Override
     protected void immersionBar() {
         ImmersionBar.with(this).titleBar(R.id.toolbar).keyboardEnable(true).init();
+    }
+
+    public ImmersionBar getImmersionBar(){
+        return ImmersionBar.with(this);
     }
 
     @Override
@@ -189,13 +197,20 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case R.id.toolbar_friend:
-                ToastUtil.show(R.string.chat_toolbar_friend);
+                onFriendsClick();
                 break;
             case R.id.toolbar_exit:
                 onExitClick();
                 break;
         }
         return true;
+    }
+
+    private void onFriendsClick(){
+        ImmersionBar.with(this).keyboardEnable(false).init();
+        friendsFragment = new FriendsFragment();
+        friendsFragment.setUsers(users);
+        friendsFragment.show(getSupportFragmentManager(), FriendsFragment.class.getSimpleName());
     }
 
     private void onExitClick() {
@@ -268,7 +283,6 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
         mBinding.rvMessage.smoothScrollToPosition(messages.size());
         resetEtMsg();
         sendChatMessage(content);
-        //addVirtualIn();
     }
 
     private void sendChatMessage(String content) {
@@ -289,27 +303,6 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
         } catch (RemoteException e) {
             e.printStackTrace();
         }
-    }
-
-    private void addVirtualIn() {
-        new Thread(() -> {
-            try {
-                Thread.sleep(1500);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            runOnUiThread(() -> {
-                MessageEntity entity = new MessageEntity();
-                entity.setType(MessageEntity.TYPE_IN);
-                entity.setContent("哈哈");
-                entity.setNickname(nickname);
-                SimpleDateFormat sf = new SimpleDateFormat("hh:mm", Locale.CHINESE);
-                entity.setTime(sf.format(new Date()));
-                messages.add(entity);
-                adapter.notifyItemInserted(messages.size() - 1);
-                mBinding.rvMessage.smoothScrollToPosition(messages.size());
-            });
-        }).start();
     }
 
     private void resetEtMsg() {
@@ -386,6 +379,7 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
 
     private void handleLogonSuccess(ArrayList<User> currentUsers) {
         onLogonSuccess();
+        users.addAll(currentUsers);
     }
 
     private void handleLogoutSuccess() {
@@ -394,11 +388,26 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
     }
 
     private void handleUserAdded(User changedUser) {
-
+        users.add(changedUser);
+        ToastUtil.show(changedUser.getNickname() + "加入群聊");
+        if(friendsFragment != null && friendsFragment.isVisible()){
+            friendsFragment.notifyUserAdded(changedUser);
+        }
     }
 
     private void handleUserQuited(User changedUser) {
-
+        int index = -1;
+        for(int i = 0; i < users.size(); i++){
+            if(changedUser.getUserCode().equals(users.get(i).getUserCode())){
+                index = i;
+                break;
+            }
+        }
+        ToastUtil.show(changedUser.getNickname() + "退出群聊");
+        users.remove(index);
+        if(friendsFragment != null && friendsFragment.isVisible()){
+            friendsFragment.notifyUserQuited(index);
+        }
     }
 
     private void handleDisconnected() {

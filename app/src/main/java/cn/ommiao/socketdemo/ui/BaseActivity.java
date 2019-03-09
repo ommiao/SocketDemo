@@ -1,4 +1,4 @@
-package cn.ommiao.socketdemo;
+package cn.ommiao.socketdemo.ui;
 
 import android.databinding.DataBindingUtil;
 import android.databinding.ViewDataBinding;

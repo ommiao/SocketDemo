@@ -1,8 +1,9 @@
-package cn.ommiao.socketdemo;
+package cn.ommiao.socketdemo.ui;
 
 
 import com.gyf.barlibrary.ImmersionBar;
 
+import cn.ommiao.socketdemo.R;
 import cn.ommiao.socketdemo.databinding.ActivityMainBinding;
 import cn.ommiao.socketdemo.socket.Config;
 import cn.ommiao.socketdemo.utils.ToastUtil;

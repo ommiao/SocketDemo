@@ -45,4 +45,5 @@ dependencies {
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.46'
     implementation 'com.orhanobut:logger:2.2.0'
     implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'de.hdodenhof:circleimageview:3.0.0'
 }
