@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Socket Demo</string>
+    <string name="app_name">Socket Chat</string>
     <string name="chat_room">WeChat</string>
     <string name="nickname_required">Nickname required!</string>
     <string name="nickname_here">Nickname here.</string>
