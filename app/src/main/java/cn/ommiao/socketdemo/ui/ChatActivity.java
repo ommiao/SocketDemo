@@ -119,6 +119,13 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
                 }
             }
         });
+        mBinding.rvMessage.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
+            if(bottom < oldBottom){
+                mBinding.rvMessage.postDelayed(() -> {
+                    mBinding.rvMessage.smoothScrollToPosition(messages.size());
+                }, 100);
+            }
+        });
         onConnecting();
     }
 
@@ -276,7 +283,7 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
         entity.setType(MessageEntity.TYPE_OUT);
         entity.setContent(content);
         entity.setNickname(nickname);
-        SimpleDateFormat sf = new SimpleDateFormat("hh:mm", Locale.CHINESE);
+        SimpleDateFormat sf = new SimpleDateFormat("HH:mm", Locale.CHINESE);
         entity.setTime(sf.format(new Date()));
         messages.add(entity);
         adapter.notifyItemInserted(messages.size() - 1);
@@ -428,7 +435,7 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
         entity.setType(MessageEntity.TYPE_IN);
         entity.setContent(wrapper.getContent());
         entity.setNickname(wrapper.getNickname());
-        SimpleDateFormat sf = new SimpleDateFormat("hh:mm", Locale.CHINESE);
+        SimpleDateFormat sf = new SimpleDateFormat("HH:mm", Locale.CHINESE);
         entity.setTime(sf.format(new Date()));
         messages.add(entity);
         adapter.notifyItemInserted(messages.size() - 1);
