@@ -25,6 +25,7 @@ public class FriendAdapter extends BaseQuickAdapter<User, BaseViewHolder> {
         assert id != null;
         helper.setImageResource(R.id.iv_nav, id);
         helper.setText(R.id.tv_nickname, item.getNickname());
+        helper.getView(R.id.tv_nickname).setSelected(true);
     }
 
     private static final HashMap<String, Integer> navMap = new HashMap<String, Integer>(){

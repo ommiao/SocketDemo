@@ -66,10 +66,10 @@
                     android:textColorHint="@color/colorPrimary"
                     android:fontFamily="@font/graydesign"
                     android:maxLines="1"
-                    android:maxLength="20"
+                    android:maxLength="12"
                     android:inputType="textEmailAddress"
-                    android:digits="\@0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-                    android:cursorVisible="false" />
+                    android:digits="\@0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ "
+                    android:cursorVisible="true" />
 
                 <ImageView
                     android:id="@+id/iv_enter"

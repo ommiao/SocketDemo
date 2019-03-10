@@ -404,9 +404,11 @@ public class ChatActivity extends BaseActivity<ActivityChatBinding> implements T
             }
         }
         ToastUtil.show(changedUser.getNickname() + "退出群聊");
-        users.remove(index);
-        if(friendsFragment != null && friendsFragment.isVisible()){
-            friendsFragment.notifyUserQuited(index);
+        if(index != -1){
+            users.remove(index);
+            if(friendsFragment != null && friendsFragment.isVisible()){
+                friendsFragment.notifyUserQuited(index);
+            }
         }
     }
 
